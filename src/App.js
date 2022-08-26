@@ -1,5 +1,5 @@
 import './App.css';
-import { rowA, rowB, weight, dataKeys, urbanData, ruralData } from './Data.js';
+import { rowA, rowB, weight, dataKeys, urbanData, ruralData } from './Survey.js';
 
 // Plots data in the table
 const PlotData = ({ startIndex = 1, type, dataKeys, data, weight }) => {
