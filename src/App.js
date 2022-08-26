@@ -1,6 +1,9 @@
 import './App.css';
 import { rowA, rowB, weight, dataKeys, urbanData, ruralData } from './Survey.js';
 
+const simulatedUrbanData = urbanData.concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData);
+const simulatedRuralData = ruralData.concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData);
+
 // Plots data in the table
 const PlotData = ({ startIndex = 1, type, dataKeys, data, weight }) => {
     return data.map((item, index) => {
@@ -201,14 +204,14 @@ function App() {
                     <PlotData
                         type='Urban'
                         dataKeys={dataKeys}
-                        data={urbanData}
+                        data={simulatedUrbanData}
                         weight={weight}
                     />
                     <PlotData
-                        startIndex={Object.keys(urbanData).length + 1}
+                        startIndex={Object.keys(simulatedUrbanData).length + 1}
                         type='Rural'
                         dataKeys={dataKeys}
-                        data={ruralData}
+                        data={simulatedRuralData}
                         weight={weight}
                     />
                     <tr>
@@ -223,7 +226,7 @@ function App() {
                         <td colSpan={3}>Uncensored Headcount Ratio</td>
                         <HeadCount
                             dataKeys={dataKeys}
-                            data={urbanData.concat(ruralData)}
+                            data={simulatedUrbanData.concat(simulatedRuralData)}
                             weight={weight}
                         />
                     </tr>
@@ -231,7 +234,7 @@ function App() {
                         <td colSpan={3}>Censored Headcount Ratio</td>
                         <HeadCount
                             dataKeys={dataKeys}
-                            data={urbanData.concat(ruralData)}
+                            data={simulatedUrbanData.concat(simulatedRuralData)}
                             weight={weight}
                             isCensored={true}
                         />
@@ -240,7 +243,7 @@ function App() {
                         <td colSpan={3}>Percentage Contribution (in %)</td>
                         <PercentageContribution
                             dataKeys={dataKeys}
-                            data={urbanData.concat(ruralData)}
+                            data={simulatedUrbanData.concat(simulatedRuralData)}
                             weight={weight}
                         />
                     </tr>
@@ -248,7 +251,7 @@ function App() {
                         <td colSpan={3}>MPI (in %)</td>
                         <MPI
                             dataKeys={dataKeys}
-                            data={urbanData.concat(ruralData)}
+                            data={simulatedUrbanData.concat(simulatedRuralData)}
                             weight={weight}
                         />
                     </tr>
@@ -256,7 +259,7 @@ function App() {
                         <td colSpan={3}>Overall Headcount (in %)</td>
                         <OverallHeadCount
                             dataKeys={dataKeys}
-                            data={urbanData.concat(ruralData)}
+                            data={simulatedUrbanData.concat(simulatedRuralData)}
                             weight={weight}
                         />
                     </tr>
