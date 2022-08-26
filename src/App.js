@@ -89,6 +89,27 @@ const PercentageContribution = ({ dataKeys, data, weight}) => {
     </>;
 }
 
+// Same as calculateM0
+const mpiCalculation = (dataKeys, data, weight) => {
+    // get total size
+    let totalSize = 0;
+    let sumOfSizeXCk = 0;
+
+    data.forEach(item => {
+        let c = calculateC(dataKeys, item, weight);
+        let ck = c < 0.33 ? 0 : c;
+        sumOfSizeXCk += item.hhsize * ck;
+        totalSize += item.hhsize;
+    })
+
+    return sumOfSizeXCk / totalSize;
+}
+
+const MPI = ({ dataKeys, data, weight}) => {
+    let mpi = mpiCalculation(dataKeys, data, weight);
+    return <td>{mpi.toFixed(2)}</td>;
+}
+
 const headCount = (dataKeys, data, weight, isCensored) => {
     // get total size
     let totalSize = 0;
@@ -125,6 +146,29 @@ const HeadCount = ({ dataKeys, data, weight, isCensored = false}) => {
         }
     </>;
 }
+
+const overallHeadCountCalculation = (dataKeys, data, weight) => {
+    // get total size
+    let totalSize = 0;
+    let sumOfSizeOfPoor = 0;
+
+    data.forEach(item => {
+        let c = calculateC(dataKeys, item, weight);
+        let ck = c < 0.33 ? 0 : c;
+        if (ck) {
+            sumOfSizeOfPoor += item.hhsize;
+        }
+        totalSize += item.hhsize;
+    })
+
+    return sumOfSizeOfPoor / totalSize;
+}
+
+const OverallHeadCount = ({ dataKeys, data, weight}) => {
+    let ohc = overallHeadCountCalculation(dataKeys, data, weight);
+    return <td>{ohc.toFixed(2)}</td>;
+}
+
 
 function App() {
     return (
@@ -195,6 +239,22 @@ function App() {
                     <tr>
                         <td colSpan={3}>Percentage Contribution (in %)</td>
                         <PercentageContribution
+                            dataKeys={dataKeys}
+                            data={urbanData.concat(ruralData)}
+                            weight={weight}
+                        />
+                    </tr>
+                    <tr>
+                        <td colSpan={3}>MPI (in %)</td>
+                        <MPI
+                            dataKeys={dataKeys}
+                            data={urbanData.concat(ruralData)}
+                            weight={weight}
+                        />
+                    </tr>
+                    <tr>
+                        <td colSpan={3}>Overall Headcount (in %)</td>
+                        <OverallHeadCount
                             dataKeys={dataKeys}
                             data={urbanData.concat(ruralData)}
                             weight={weight}
