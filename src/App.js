@@ -173,6 +173,17 @@ const OverallHeadCount = ({ dataKeys, data, weight}) => {
     return <td>{ohc.toFixed(2)}</td>;
 }
 
+const intensityCalculation = (dataKeys, data, weight) => {
+    let mpi = mpiCalculation(dataKeys, data, weight);
+    let overallHeadCount = overallHeadCountCalculation(dataKeys, data, weight);
+
+    return mpi.toFixed(2) / overallHeadCount.toFixed(2);
+}
+
+const Intensity = ({ dataKeys, data, weight}) => {
+    let intensity = intensityCalculation(dataKeys, data, weight);
+    return <td>{intensity.toFixed(2)}</td>;
+}
 
 function App() {
     return (
@@ -259,6 +270,14 @@ function App() {
                     <tr>
                         <td colSpan={3}>Overall Headcount (in %)</td>
                         <OverallHeadCount
+                            dataKeys={dataKeys}
+                            data={simulatedUrbanData.concat(simulatedRuralData)}
+                            weight={weight}
+                        />
+                    </tr>
+                    <tr>
+                        <td colSpan={3}>Intensity (in %)</td>
+                        <Intensity
                             dataKeys={dataKeys}
                             data={simulatedUrbanData.concat(simulatedRuralData)}
                             weight={weight}
