@@ -1,8 +1,9 @@
 import './App.css';
 import { rowA, rowB, weight, dataKeys, urbanData, ruralData } from './Survey.js';
 
-const simulatedUrbanData = urbanData.concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData).concat(urbanData);
-const simulatedRuralData = ruralData.concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData).concat(ruralData);
+//const simulatedUrbanData = urbanData.concat(urbanData).concat(urbanData);
+const simulatedUrbanData = urbanData;
+const simulatedRuralData = ruralData;
 
 // Plots data in the table
 const PlotData = ({ startIndex = 1, type, dataKeys, data, weight }) => {
