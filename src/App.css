@@ -1,4 +1,4 @@
-.app-header, .main {
+.app-header {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,6 +6,30 @@
 
 .app-header h1 {
     font-size: 25px;
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.filter {
+    padding: 10px;
+}
+
+.filter button {
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 10px;
+}
+
+.filter button:hover, .filter button.active {
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
 }
 
 table {
