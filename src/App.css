@@ -17,6 +17,7 @@
 
 .filter {
     padding: 10px;
+    display: flex;
 }
 
 .filter button {
@@ -32,12 +33,22 @@
     cursor: pointer;
 }
 
+.toggleButtonGroup {
+    border: 2px solid #000;
+}
+.toggleButtonGroup button {
+    margin-right: 0;
+    border-radius: 0;
+}
+
 table {
     width: 100%;
     max-width: 1200px;
     min-width: 800px;
     overflow: scroll;
     border: 2px solid gray;
+    word-break: break-all;
+    counter-reset: row-num;
 }
 
 table, tr, td, th {
@@ -47,4 +58,13 @@ table, tr, td, th {
 
 td, th {
     padding: 7px 5px;
+    width: 20px;
+}
+
+table .data-row {
+  counter-increment: row-num;
+}
+
+table .data-row td:nth-child(2)::before {
+    content: counter(row-num);
 }

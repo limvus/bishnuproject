@@ -1,37 +1,61 @@
 import { useState } from 'react';
 import './App.css';
-import { rowA, rowB, weight, dataKeys, urbanData, ruralData } from './Survey.js';
+import { rowA, rowB, rowB2, weight, dataKeys, dataKeys2, urbanData, ruralData } from './Survey.js';
 
 
 // Plots data in the table
-const PlotData = ({ startIndex = 1, type, dataKeys, data, weight, filter }) => {
+const PlotData = ({ type, dataKeys, data, weight, filter, display }) => {
     let isTypeSet = 0;
 
     return data.map((item, index) => {
         let c = calculateC(dataKeys, item, weight);
 
         if (filter === 'poor' && c < 0.33) return;
-        if (filter === 'wealthy' && c >= 0.33) return;
+        if (filter === 'notPoor' && c >= 0.33) return;
 
         const row = (
-            <tr key={index}>
+            <tr key={index} className="data-row">
                 <td>{isTypeSet ? '' : type}</td>
-                <td>{startIndex++}</td>
+                <td></td>
                 <td>{item.hhsize}</td>
-                <td>{item.sc}</td>
-                <td>{item.at}</td>
-                <td>{item.n}</td>
-                <td>{item.m}</td>
-                <td>{item.e}</td>
-                <td>{item.s}</td>
-                <td>{item.w}</td>
-                <td>{item.f}</td>
-                <td>{item.c}</td>
-                <td>{item.a}</td>
-                <td>{c}</td>
+                {
+                    display === 'causes' ? (
+                        <>
+                            <td>{item.fatalism}</td>
+                            <td>{item.discrimination}</td>
+                            <td>{item.singleMother}</td>
+                            <td>{item.houseWife}</td>
+                            <td>{item.attitude}</td>
+                            <td>{item.largeFamily}</td>
+                            <td>{item.noSaving}</td>
+                            <td>{item.noExtraIncome}</td>
+                            <td>{item.unemployed}</td>
+                            <td>{item.poorEducation}</td>
+                            <td>{item.badPolicies}</td>
+                            <td>{item.noOfficer}</td>
+                            <td>{item.alienation}</td>
+                            <td>{item.noPoliticalPower}</td>
+                            <td>{item.poorInfrastructures}</td>
+                        </>
+                    ) : (
+                        <>
+                            <td>{item.sc}</td>
+                            <td>{item.at}</td>
+                            <td>{item.n}</td>
+                            <td>{item.m}</td>
+                            <td>{item.e}</td>
+                            <td>{item.s}</td>
+                            <td>{item.w}</td>
+                            <td>{item.f}</td>
+                            <td>{item.c}</td>
+                            <td>{item.a}</td>
+                            <td>{c}</td>
+                            <td>{c < 0.33 ? 0 : c}</td>
+                        </>
+                    )
+                }
                 <td>{c < 0.33 ? 'No' : 'Yes'}</td>
-                <td>{c < 0.33 ? 0 : c}</td>
-            </tr>
+            </tr >
         );
 
         if (!isTypeSet) isTypeSet = 1;
@@ -195,13 +219,55 @@ const Intensity = ({ dataKeys, data, weight }) => {
     return <td>{intensity.toFixed(2)}</td>;
 }
 
+const causePercentageCalculation = (dataKeys, dataKeys2, data, weight, filter) => {
+    let cp = [];
+
+    dataKeys2.forEach(dataKey => {
+        let totalSample = 0;
+        let agreedCause = 0;
+        data.forEach(item => {
+            let c = calculateC(dataKeys, item, weight);
+            let ck = c < 0.33 ? 0 : c;
+            if (filter === 'poor') {
+                if (!ck) return;
+                totalSample += 1;
+                if (item[dataKey]) agreedCause += 1;
+            } else if (filter === 'notPoor') {
+                if (ck) return;
+                totalSample += 1;
+                if (item[dataKey]) agreedCause += 1;
+            } else {
+                totalSample += 1;
+                if (item[dataKey]) agreedCause += 1;
+            }
+        });
+        cp.push((agreedCause / totalSample).toFixed(2));
+    })
+
+    return cp;
+}
+
+const CausePercentage = ({ dataKeys, dataKeys2, data, weight, filter }) => {
+    let cp = causePercentageCalculation(dataKeys, dataKeys2, data, weight, filter);
+
+    return <>
+        {
+            cp.map((item, index) => {
+                return <td key={item + index}>{item}</td>
+            })
+        }
+    </>;
+}
+
+
 const App = () => {
     //const simulatedUrbanData = urbanData.concat(urbanData).concat(urbanData);
     const simulatedUrbanData = urbanData;
     const simulatedRuralData = ruralData;
     const allData = simulatedUrbanData.concat(ruralData);
     const ruralStartIndex = Object.keys(simulatedUrbanData).length + 1;
-    const [filter, setFilter] = useState('');
+    const [filter, setFilter] = useState(''); // poor|notPoor
+    const [display, setDisplay] = useState(''); // causes
 
     return (
         <div className="App">
@@ -212,102 +278,144 @@ const App = () => {
                 <div className="filter">
                     <button className={filter === '' ? 'active' : ''} onClick={() => setFilter('')}>All</button>
                     <button className={filter === 'poor' ? 'active' : ''} onClick={() => setFilter('poor')}>Poor</button>
-                    <button className={filter === 'wealthy' ? 'active' : ''} onClick={() => setFilter('wealthy')}>Wealthy</button>
+                    <button className={filter === 'notPoor' ? 'active' : ''} onClick={() => setFilter('notPoor')}>Not Poor</button>
+                    <div className="toggleButtonGroup">
+                        <button className={display === 'causes' ? 'active' : ''} onClick={() => setDisplay('causes')}>Causes</button>
+                        <button className={display === '' ? 'active' : ''} onClick={() => setDisplay('')}>D Matrix</button>
+                    </div>
                 </div>
                 <table>
                     <tbody>
-                        <tr>
+                        {/*<tr>
                             {
                                 rowA.map((item, index) => {
                                     return <th key={item + index}>{item}</th>
                                 })
                             }
                         </tr>
-                        <tr>
-                            <th colSpan={3}></th>
-                            <th colSpan={2}>Education</th>
-                            <th colSpan={2}>Health</th>
-                            <th colSpan={6}>Standard of living</th>
-                        </tr>
-                        <tr>
-                            {
-                                rowB.map((item, index) => {
-                                    return <th key={item + index}>{item}</th>
-                                })
-                            }
-                        </tr>
+                        */}
+                        {
+                            display !== 'causes' && (
+                                <tr>
+                                    <th colSpan={3}></th>
+                                    <th colSpan={2}>Education</th>
+                                    <th colSpan={2}>Health</th>
+                                    <th colSpan={6}>Standard of living</th>
+                                </tr>
+                            )
+                        }
+                        {
+                            display === 'causes' ? (
+                                <tr>
+                                    {
+                                        rowB2.map((item, index) => {
+                                            return <th key={item + index}>{item}</th>
+                                        })
+                                    }
+                                </tr>
+                            ) : (
+                                <tr>
+                                    {
+                                        rowB.map((item, index) => {
+                                            return <th key={item + index}>{item}</th>
+                                        })
+                                    }
+                                </tr>
+                            )
+                        }
                         <PlotData
                             type='Urban'
                             dataKeys={dataKeys}
                             data={simulatedUrbanData}
                             weight={weight}
                             filter={filter}
+                            display={display}
                         />
                         <PlotData
-                            startIndex={ruralStartIndex}
                             type='Rural'
                             dataKeys={dataKeys}
                             data={simulatedRuralData}
                             weight={weight}
                             filter={filter}
+                            display={display}
                         />
-                        <tr>
-                            <td colSpan={3}>Weight(w)</td>
-                            {
-                                dataKeys.slice(1).map((item, index) => {
-                                    return <td key={item + index}>{weight[item]}</td>
-                                })
-                            }
-                        </tr>
-                        <tr>
-                            <td colSpan={3}>Uncensored Headcount Ratio</td>
-                            <HeadCount
-                                dataKeys={dataKeys}
-                                data={allData}
-                                weight={weight}
-                            />
-                        </tr>
-                        <tr>
-                            <td colSpan={3}>Censored Headcount Ratio</td>
-                            <HeadCount
-                                dataKeys={dataKeys}
-                                data={allData}
-                                weight={weight}
-                                isCensored={true}
-                            />
-                        </tr>
-                        <tr>
-                            <td colSpan={3}>Percentage Contribution (in %)</td>
-                            <PercentageContribution
-                                dataKeys={dataKeys}
-                                data={allData}
-                                weight={weight}
-                            />
-                        </tr>
-                        <tr>
-                            <td colSpan={3}>MPI (in %)</td>
-                            <MPI
-                                dataKeys={dataKeys}
-                                data={allData}
-                                weight={weight}
-                            />
-                        </tr>
-                        <tr>
-                            <td colSpan={3}>Overall Headcount (in %)</td>
-                            <OverallHeadCount
-                                dataKeys={dataKeys}
-                                data={allData}
-                                weight={weight}
-                            />
-                        </tr>
-                        <tr>
-                            <td colSpan={3}>Intensity (in %)</td>
-                            <Intensity
-                                dataKeys={dataKeys}
-                                data={allData}
-                                weight={weight}
-                            />
-                        </tr>
+                        {
+                            display === 'causes' ? (
+                                <>
+                                    <tr>
+                                        <td colSpan={3}>Cause Percentage (in %)</td>
+                                        <CausePercentage
+                                            dataKeys={dataKeys}
+                                            dataKeys2={dataKeys2}
+                                            data={allData}
+                                            weight={weight}
+                                            filter={filter}
+                                        />
+                                    </tr>
+                                </>
+                            ) : (
+                                <>
+                                    <tr>
+                                        <td colSpan={3}>Weight(w)</td>
+                                        {
+                                            dataKeys.slice(1).map((item, index) => {
+                                                return <td key={item + index}>{weight[item]}</td>
+                                            })
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={3}>Uncensored Headcount Ratio</td>
+                                        <HeadCount
+                                            dataKeys={dataKeys}
+                                            data={allData}
+                                            weight={weight}
+                                        />
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={3}>Censored Headcount Ratio</td>
+                                        <HeadCount
+                                            dataKeys={dataKeys}
+                                            data={allData}
+                                            weight={weight}
+                                            isCensored={true}
+                                        />
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={3}>Percentage Contribution (in %)</td>
+                                        <PercentageContribution
+                                            dataKeys={dataKeys}
+                                            data={allData}
+                                            weight={weight}
+                                        />
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={3}>MPI (in %)</td>
+                                        <MPI
+                                            dataKeys={dataKeys}
+                                            data={allData}
+                                            weight={weight}
+                                        />
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={3}>Overall Headcount (in %)</td>
+                                        <OverallHeadCount
+                                            dataKeys={dataKeys}
+                                            data={allData}
+                                            weight={weight}
+                                        />
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={3}>Intensity (in %)</td>
+                                        <Intensity
+                                            dataKeys={dataKeys}
+                                            data={allData}
+                                            weight={weight}
+                                        />
+                                    </tr>
+
+                                </>
+                            )
+                        }
 
                     </tbody>
                 </table>
